@@ -1,5 +1,7 @@
 package com.practice.jwt.service;
 
+import java.util.Optional;
+
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.security.crypto.password.PasswordEncoder;
 import org.springframework.stereotype.Service;
@@ -17,9 +19,9 @@ public class UserService {
     private final PasswordEncoder passwordEncoder;
 
     @Autowired
-    public UserService(UserRepository userRepository, PasswordEncoder  passwordEncoder) {
+    public UserService(UserRepository userRepository, PasswordEncoder passwordEncoder) {
         this.userRepository = userRepository;
-        this.passwordEncoder  = passwordEncoder;
+        this.passwordEncoder = passwordEncoder;
         System.out.println("UserService 생성.");
     }
 
@@ -35,6 +37,11 @@ public class UserService {
                 .orElseThrow(() -> new UserNotFoundException("사용자를 찾을 수 없습니다: " + username));  // 사용자 이름으로 사용자 정보를 찾고 반환함.
     }
     
+    // 사용자 이름으로 사용자를 찾는 메서드 (Optional 반환)
+    public Optional<User> findOptionalByUsername(String username) {
+        return userRepository.findByUsername(username);
+    }
+
     // 사용자 정보를 업데이트하는 메서드
     public User update(User user) {
         User existingUser = userRepository.findById(user.getId())
@@ -49,23 +56,12 @@ public class UserService {
         return userRepository.save(user);  // 업데이트된 사용자 정보를 저장하고 반환함.
     }
     
-    /**
-     * 주어진 사용자 이름을 기반으로 사용자를 찾고
-     * 해당 사용자에게 액세스 토큰을 저장
-     * 
-     * @param username   사용자의 이름
-     * @param accessToken 저장할 액세스 토큰
-     * @throws RuntimeException 사용자가 존재하지 않는 경우 예외를 발생시킴
-     */
     @Transactional // 메서드 실행 중 예외가 발생하면 자동으로 롤백
     public void saveAccessToken(String username, String accessToken) {
-        // 주어진 사용자 이름으로 사용자를 찾음
         User user = userRepository.findByUsername(username)
                 .orElseThrow(() -> new RuntimeException("User not found"));
         
-        // 사용자의 액세스 토큰을 설정
         user.setAccessToken(accessToken);
-        // 변경된 사용자를 데이터베이스에 저장
         userRepository.save(user);
     }
 }

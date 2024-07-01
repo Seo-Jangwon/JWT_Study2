@@ -5,6 +5,7 @@ import org.springframework.context.annotation.Bean;
 import org.springframework.context.annotation.Configuration;
 
 import com.practice.jwt.Filter.JwtRequestFilter;
+import com.practice.jwt.service.UserService;
 
 import org.springframework.context.annotation.Bean;
 import org.springframework.context.annotation.Configuration;
@@ -34,4 +35,5 @@ public class FilterConfig {
         // 이 객체는 Spring 컨테이너에 의해 관리되며 필터 체인에 추가됨
         return registrationBean;
     }
+    
 }
